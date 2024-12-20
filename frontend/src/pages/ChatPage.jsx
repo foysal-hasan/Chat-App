@@ -10,6 +10,7 @@ import ChatMessageInput from "../components/chat/ChatInput";
 import ChatMessageList from "../components/chat/ChatMessageList";
 import { useSocket } from "../context/SocketContext";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const filterChats = (chats, localSearchQuery) => {
   if (!localSearchQuery.trim()) return chats; // Return all chats if search query is empty
@@ -73,7 +74,7 @@ const ChatPage = () => {
     try {
       const { data } = await getUserChats();
       setChats(data.chats);
-      console.log(data.chats);
+      console.log(data);
     } catch (error) {
       console.log(error);
       toast.error("Server Error");
@@ -196,6 +197,11 @@ const ChatPage = () => {
     getMessages();
   };
 
+  const logoutHanlder = () => {
+    window.location.replace("/login");
+    localStorage.clear();
+  };
+
   useEffect(() => {
     getChats();
   }, []);
@@ -249,7 +255,7 @@ const ChatPage = () => {
     <>
       <AddUserOrGroupModal isOpen={isOpen} setIsOpen={setIsOpen} />
       <div className="flex">
-        <div className="w-[500px] min-h-screen p-4 border-r-2 border-cyan-600">
+        <div className="w-[650px] min-h-screen p-4 border-r-2 border-cyan-600">
           <div className="flex justify-between mb-4">
             <input
               type="text"
@@ -267,12 +273,19 @@ const ChatPage = () => {
               <UserPlusIcon className="w-5 h-5 inline-block mr-0.5 mb-0.5" />{" "}
               Add Chat
             </button>
+
+            <button
+              className="px-4 py-2 bg-red-600 rounded text-center text-white"
+              onClick={logoutHanlder}
+            >
+              Logout
+            </button>
           </div>
           <div
             className={`text-white pr-2 overflow-x-hidden overflow-y-auto scrollbar-none`}
             style={{ height: "calc(100vh - 90px)" }}
           >
-            {chats.length > 0 ? (
+            {chats?.length > 0 &&
               filterChats(chats, localSearchQuery).map((chat) => (
                 <div key={chat._id}>
                   {chat.isGroupChat === true ? (
@@ -293,10 +306,7 @@ const ChatPage = () => {
                     />
                   )}
                 </div>
-              ))
-            ) : (
-              <Loader />
-            )}
+              ))}
           </div>
         </div>
         <div className="w-screen min-h-screen text-white">

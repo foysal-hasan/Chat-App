@@ -25,7 +25,7 @@ export const loginUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ username });
 
   if (!user || !(await user.matchPassword(password))) {
-    throw new errors.BadRequestError("Invalid email or password");
+    throw new errors.BadRequestError("Invalid username or password");
   }
 
   generateTokenAndSendResponse(res, user);
